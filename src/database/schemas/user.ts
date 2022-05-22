@@ -7,13 +7,17 @@ export default model(
       type: String,
       required: true
     },
+    isRegistered: {
+      type: Boolean,
+      required: true
+    },
     email: {
       type: String,
-      required: true
+      required: false
     },
     password: {
       type: String,
-      required: true
+      required: false
     },
     name: {
       type: String,

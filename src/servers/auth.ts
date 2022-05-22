@@ -1,10 +1,14 @@
+import bcrypt from 'bcrypt';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import { addNewUser, getUserByEmail } from '../controllers/user-controller';
+import {
+  createGuestUser,
+  getUserByEmail,
+  registerUser
+} from '../controllers/user-controller';
 import { connectToDatabase } from '../database/database';
-import cors from 'cors';
 
 dotenv.config();
 const app = express();
@@ -26,7 +30,7 @@ connectToDatabase();
 let refreshTokens = [];
 
 app.post('/token', (req, res) => {
-  const refreshToken = req.body.token;
+  const refreshToken = req.body.refreshToken;
   if (!refreshToken) return res.sendStatus(401);
   if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
@@ -37,33 +41,39 @@ app.post('/token', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  const user = await getUserByEmail(req.body.email);
+  // Either login with email and password combination or create a new guest
+  const isGuest = !(req.body.email && req.body.password);
+  const user = isGuest
+    ? await createGuestUser()
+    : await getUserByEmail(req.body.email);
+
+  // If user is not found, return 401
   if (!user) return res.sendStatus(401);
 
-  const passwordIsValid = await bcrypt.compare(
-    req.body.password,
-    user.password
-  );
-
-  if (passwordIsValid) {
+  // Either the user is a guest or the password matches
+  if (isGuest || (await bcrypt.compare(req.body.password, user.password))) {
     const payload = { id: user.id };
     const accessToken = generateAccessToken(payload);
     const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET);
     refreshTokens.push(refreshToken);
-    res
-      .sendStatus(200)
-      .json({
-        id: user.id,
-        accessToken: accessToken,
-        refreshToken: refreshToken
-      });
+    console.log(
+      'refreshTokens:',
+      refreshTokens.map((t) => t.substring(t.length - 4, t.length))
+    );
+    res.json({
+      id: user.id,
+      accessToken: accessToken,
+      refreshToken: refreshToken
+    });
   } else {
     res.sendStatus(401);
   }
 });
 
-app.delete('/logout', (req, res) => {
-  refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
+app.post('/logout', (req, res) => {
+  refreshTokens = refreshTokens.filter(
+    (refreshToken) => refreshToken !== req.body.refreshToken
+  );
   res.sendStatus(204);
 });
 
@@ -71,8 +81,7 @@ app.post('/register', async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-    addNewUser(req.body.email, hashedPassword);
-
+    registerUser(req.body.id, req.body.email, hashedPassword);
     res.status(201).send();
   } catch (err) {
     res.status(500).send();
