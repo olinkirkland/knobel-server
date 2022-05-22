@@ -38,7 +38,7 @@ app.post('/token', (req, res) => {
 
 app.post('/login', async (req, res) => {
   const user = await getUserByEmail(req.body.email);
-  if (!user) return res.sendStatus(500).send('No such user');
+  if (!user) return res.sendStatus(401);
 
   const passwordIsValid = await bcrypt.compare(
     req.body.password,
@@ -50,9 +50,15 @@ app.post('/login', async (req, res) => {
     const accessToken = generateAccessToken(payload);
     const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET);
     refreshTokens.push(refreshToken);
-    res.json({ accessToken: accessToken, refreshToken: refreshToken });
+    res
+      .sendStatus(200)
+      .json({
+        id: user.id,
+        accessToken: accessToken,
+        refreshToken: refreshToken
+      });
   } else {
-    res.status(500).send('Invalid password');
+    res.sendStatus(401);
   }
 });
 
