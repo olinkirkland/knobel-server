@@ -4,10 +4,22 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { addNewUser, getUserByEmail } from '../controllers/user-controller';
 import { connectToDatabase } from '../database/database';
+import cors from 'cors';
 
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(
+  cors({
+    origin: ['http://localhost:3002', 'https://localhost:3002'],
+    credentials: true
+  })
+);
+
+// Add 0.5 seconds of delay to every response
+app.use(function (req, res, next) {
+  setTimeout(next, 500);
+});
 
 connectToDatabase();
 

@@ -24,6 +24,7 @@
     "@types/mongodb": "^4.0.7",
     "@types/mongoose": "^5.11.97",
     "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
