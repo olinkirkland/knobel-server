@@ -71,6 +71,11 @@ app.post('/login', async (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
+  const t = req.body.refreshToken;
+  console.log(
+    'Logging out user with refresh token:',
+    t.substring(t.length - 4, t.length)
+  );
   refreshTokens = refreshTokens.filter(
     (refreshToken) => refreshToken !== req.body.refreshToken
   );
@@ -90,7 +95,7 @@ app.post('/register', async (req, res) => {
 
 function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: '10m'
+    expiresIn: '15m'
   });
 }
 

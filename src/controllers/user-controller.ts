@@ -1,5 +1,6 @@
 import User from '../database/schemas/user';
 import { v4 as uuid } from 'uuid';
+import { generateGuestName } from '../util';
 
 export async function registerUser(
   id: string,
@@ -22,7 +23,7 @@ export async function createGuestUser() {
   return await new User({
     id: uuid(),
     isRegistered: false,
-    name: 'abcdefg',
+    name: generateGuestName(),
     inventory: [],
     gold: 0,
     level: 0,

@@ -1,3 +1,4 @@
+import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import { getUserById } from '../controllers/user-controller';
@@ -8,6 +9,12 @@ import authenticate from '../middlewares/authenticate';
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(
+  cors({
+    origin: ['http://localhost:3002', 'https://localhost:3002'],
+    credentials: true
+  })
+);
 
 connectToDatabase();
 
@@ -16,8 +23,6 @@ app.get('/posts', authenticate, (req, res) => {
 });
 
 app.get('/me', authenticate, async (req, res) => {
-  console.log('me', req.id);
-
   const user = await getUserById(req.id);
   if (!user) return res.sendStatus(404);
 
