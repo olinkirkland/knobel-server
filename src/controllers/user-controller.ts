@@ -8,18 +8,24 @@ export async function registerUser(
   password: string
 ) {
   // Register an account
+  console.log(id);
   const user = await getUserById(id);
   if (!user || user.isRegistered) {
-    return;
+    console.log(user);
+    return false;
   }
 
   user.isRegistered = true;
   user.email = email;
   user.password = password;
-  user.save();
+  await user.save();
+
+  return true;
 }
 
 export async function createGuestUser() {
+  // Create a guest user
+  console.log('👻', 'Guest user was created');
   return await new User({
     id: uuid(),
     isRegistered: false,

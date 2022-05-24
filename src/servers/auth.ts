@@ -9,6 +9,7 @@ import {
   registerUser
 } from '../controllers/user-controller';
 import { connectToDatabase } from '../database/database';
+import authenticate from '../middlewares/authenticate';
 
 dotenv.config();
 const app = express();
@@ -32,9 +33,9 @@ let refreshTokens = [];
 app.post('/token', (req, res) => {
   const refreshToken = req.body.refreshToken;
   if (!refreshToken) return res.sendStatus(401);
-  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(401);
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
-    if (err) return res.sendStatus(403);
+    if (err) return res.sendStatus(401);
     const accessToken = generateAccessToken({ id: data.id });
     res.json({ id: data.id, accessToken: accessToken });
   });
@@ -48,7 +49,7 @@ app.post('/login', async (req, res) => {
     : await getUserByEmail(req.body.email);
 
   // If user is not found, return 401
-  if (!user) return res.sendStatus(401);
+  if (!user) return res.status(401).send('Incorrect email or password.');
 
   // Either the user is a guest or the password matches
   if (isGuest || (await bcrypt.compare(req.body.password, user.password))) {
@@ -66,7 +67,7 @@ app.post('/login', async (req, res) => {
       refreshToken: refreshToken
     });
   } else {
-    res.sendStatus(401);
+    res.status(401).send('Incorrect Email or password.');
   }
 });
 
@@ -82,11 +83,29 @@ app.post('/logout', (req, res) => {
   res.sendStatus(204);
 });
 
-app.post('/register', async (req, res) => {
+app.post('/register', authenticate, async (req, res) => {
+  // Authenticate is required because an existing guest user is upgrading to a registered account
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const email = req.body.email;
+    const password = await bcrypt.hash(req.body.password, 10);
 
-    registerUser(req.body.id, req.body.email, hashedPassword);
+    console.log('🆕', 'Registering email', email, '...');
+
+    // Is the email already registered?
+    const user = await getUserByEmail(email);
+    if (user) {
+      console.log('❌', email, 'is already registered');
+      return res.status(409).send(`The Email ${email} is already registered.`);
+    }
+
+    const isRegistered = await registerUser(req.id, email, password);
+    if (isRegistered) {
+      console.log('✔️', email, 'registered successfully');
+    } else {
+      console.log('❌', email, 'failed to register');
+      res.status(409).send();
+    }
+
     res.status(201).send();
   } catch (err) {
     res.status(500).send();
