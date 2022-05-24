@@ -28,12 +28,13 @@ app.use(function (req, res, next) {
 
 connectToDatabase();
 
-let refreshTokens = [];
+let refreshTokensWithUserIds: Array<{ id: string; token: string }> = [];
 
 app.post('/token', (req, res) => {
   const refreshToken = req.body.refreshToken;
   if (!refreshToken) return res.sendStatus(401);
-  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(401);
+  if (!refreshTokensWithUserIds.find((t) => t.token === refreshToken))
+    return res.sendStatus(401);
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
     if (err) return res.sendStatus(401);
     const accessToken = generateAccessToken({ id: data.id });
@@ -55,12 +56,25 @@ app.post('/login', async (req, res) => {
   if (isGuest || (await bcrypt.compare(req.body.password, user.password))) {
     const payload = { id: user.id };
     const accessToken = generateAccessToken(payload);
-    const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET);
-    refreshTokens.push(refreshToken);
-    console.log(
-      'refreshTokens:',
-      refreshTokens.map((t) => t.substring(t.length - 4, t.length))
+
+    // If a refresh token already exists, remove it; This logs out any concurrent sessions
+    refreshTokensWithUserIds = refreshTokensWithUserIds.filter(
+      (t) => t.id !== user.id
     );
+
+    const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET);
+    refreshTokensWithUserIds.push({ id: user.id, token: refreshToken });
+
+    console.log(
+      'refreshTokensWithUserIds:',
+      refreshTokensWithUserIds.map((t) => {
+        return {
+          id: t.id.substring(0, 6),
+          token: t.token.substring(t.token.length - 4, t.token.length)
+        };
+      })
+    );
+
     res.json({
       id: user.id,
       accessToken: accessToken,
@@ -77,8 +91,8 @@ app.post('/logout', (req, res) => {
     'Logging out user with refresh token:',
     t.substring(t.length - 4, t.length)
   );
-  refreshTokens = refreshTokens.filter(
-    (refreshToken) => refreshToken !== req.body.refreshToken
+  refreshTokensWithUserIds = refreshTokensWithUserIds.filter(
+    (t) => t.token !== req.body.refreshToken
   );
   res.sendStatus(204);
 });
