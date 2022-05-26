@@ -69,7 +69,7 @@ app.post('/login', async (req, res) => {
       'refreshTokensWithUserIds:',
       refreshTokensWithUserIds.map((t) => {
         return {
-          id: t.id.substring(0, 6),
+          id: t.id.substring(0, 4),
           token: t.token.substring(t.token.length - 4, t.token.length)
         };
       })

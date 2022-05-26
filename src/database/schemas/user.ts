@@ -38,26 +38,45 @@ export default model(
     experience: {
       type: Number,
       required: true
+    },
+    avatar: {
+      type: String,
+      required: true
+    },
+    wallpaper: {
+      type: String,
+      required: true
+    },
+    note: {
+      type: String,
+      required: false
     }
   })
 );
 
 export function toPublicUserData(user) {
-  return {
+  const packedUser = {
     id: user.id,
     name: user.name,
-    level: user.level
+    avatar: user.avatar,
+    note: user.note,
+    level: user.level,
+    isRegistered: user.isRegistered
   };
+
+  return packedUser;
 }
 
 export function toPersonalUserData(user) {
-  return {
-    id: user.id,
+  const packedUser = toPublicUserData(user);
+
+  Object.assign(packedUser, {
     email: user.email,
-    name: user.name,
     inventory: user.inventory,
     gold: user.gold,
-    level: user.level,
-    experience: user.experience
-  };
+    experience: user.experience,
+    wallpaper: user.wallpaper
+  });
+
+  return packedUser;
 }

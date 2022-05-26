@@ -25,16 +25,24 @@ export async function registerUser(
 
 export async function createGuestUser() {
   // Create a guest user
-  console.log('👻', 'Guest user was created');
-  return await new User({
+  const user = await new User({
     id: uuid(),
     isRegistered: false,
     name: generateGuestName(),
-    inventory: [],
-    gold: 0,
-    level: 0,
-    experience: 0
+    note: 'This user prefers to keep an air of mystery about them.',
+    avatar: 'inmQ-K0Zd',
+    wallpaper: 'nbKnDUBgYwiQcUJjI8gYG',
+    inventory: [
+      'inmQ-K0Zd', // Anon (Avatar)
+      'nbKnDUBgYwiQcUJjI8gYG', // Prism (Wallpaper)
+      'KgkdXnvuUjgFg9mFsF_o1' // Embroidery (Wallpaper)
+    ],
+    gold: Math.floor(Math.random() * 100),
+    level: Math.floor(Math.random() * 10) + 1,
+    experience: Math.floor(Math.random() * 100)
   }).save();
+  console.log('👻', 'Guest user', user.id.substring(0, 4), 'created');
+  return user;
 }
 
 export async function getUserById(id: string) {
