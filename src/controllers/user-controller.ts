@@ -1,6 +1,7 @@
-import User from '../database/schemas/user';
+import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
-import { generateGuestName } from '../util';
+import User from '../database/schemas/user';
+import { generateGuestName, generateVerifyCode } from '../util';
 
 export async function registerUser(
   id: string,
@@ -23,6 +24,33 @@ export async function registerUser(
   return true;
 }
 
+export async function changeName(id: string, name: string) {
+  const user = await getUserById(id);
+  if (!user || !user.isRegistered) return false;
+
+  user.name = name;
+  await user.save();
+
+  return true;
+}
+
+export async function changePassword(
+  id: string,
+  oldPassword: string,
+  newPassword: string
+) {
+  const user = await getUserById(id);
+  if (!user || !user.isRegistered) return false;
+
+  // Check if the old password is correct
+  const isCorrect = await bcrypt.compare(oldPassword, user.password);
+
+  user.password = newPassword;
+  await user.save();
+
+  return true;
+}
+
 export async function createGuestUser() {
   // Create a guest user
   const user = await new User({
@@ -37,9 +65,10 @@ export async function createGuestUser() {
       'nbKnDUBgYwiQcUJjI8gYG', // Prism (Wallpaper)
       'KgkdXnvuUjgFg9mFsF_o1' // Embroidery (Wallpaper)
     ],
-    gold: Math.floor(Math.random() * 100),
-    level: Math.floor(Math.random() * 10) + 1,
-    experience: Math.floor(Math.random() * 100)
+    verifyCode: generateVerifyCode(),
+    gold: 0,
+    level: 1,
+    experience: 0
   }).save();
   console.log('👻', 'Guest user', user.id.substring(0, 4), 'created');
   return user;

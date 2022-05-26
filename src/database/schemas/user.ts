@@ -19,6 +19,10 @@ export default model(
       type: String,
       required: false
     },
+    verifyCode: {
+      type: String,
+      required: false
+    },
     name: {
       type: String,
       required: true
