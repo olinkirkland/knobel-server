@@ -5,6 +5,7 @@ import { getUserById } from '../controllers/user-controller';
 import { connectToDatabase } from '../database/database';
 import { toPersonalUserData, toPublicUserData } from '../database/schemas/user';
 import authenticate from '../middlewares/authenticate';
+import meRoute from './routes/me';
 
 dotenv.config();
 const app = express();
@@ -18,16 +19,7 @@ app.use(
 
 connectToDatabase();
 
-app.get('/posts', authenticate, (req, res) => {
-  // res.json(posts.filter((post) => post.username === req.user.username));
-});
-
-app.get('/me', authenticate, async (req, res) => {
-  const user = await getUserById(req.id);
-  if (!user) return res.sendStatus(404);
-
-  res.json(toPersonalUserData(user));
-});
+app.use('/me', meRoute);
 
 app.get('/user/:id', authenticate, async (req, res) => {
   const targetUser = await getUserById(req.params.id);

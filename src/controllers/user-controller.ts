@@ -2,50 +2,14 @@ import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import User from '../database/schemas/user';
 import { generateGuestName, generateVerifyCode } from '../util';
+import { ItemType } from './resource-controller';
 
-export async function registerUser(
-  id: string,
-  email: string,
-  password: string
-) {
-  // Register an account
-  console.log(id);
-  const user = await getUserById(id);
-  if (!user || user.isRegistered) {
-    console.log(user);
-    return false;
-  }
+export async function registerUser(user, email: string, password: string) {
+  if (user.isRegistered) return false;
 
   user.isRegistered = true;
   user.email = email;
   user.password = password;
-  await user.save();
-
-  return true;
-}
-
-export async function changeName(id: string, name: string) {
-  const user = await getUserById(id);
-  if (!user || !user.isRegistered) return false;
-
-  user.name = name;
-  await user.save();
-
-  return true;
-}
-
-export async function changePassword(
-  id: string,
-  oldPassword: string,
-  newPassword: string
-) {
-  const user = await getUserById(id);
-  if (!user || !user.isRegistered) return false;
-
-  // Check if the old password is correct
-  const isCorrect = await bcrypt.compare(oldPassword, user.password);
-
-  user.password = newPassword;
   await user.save();
 
   return true;

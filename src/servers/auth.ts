@@ -3,9 +3,11 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import { addWelcomeItems } from '../controllers/resource-controller';
 import {
   createGuestUser,
   getUserByEmail,
+  getUserById,
   registerUser
 } from '../controllers/user-controller';
 import { connectToDatabase } from '../database/database';
@@ -106,19 +108,25 @@ app.post('/register', authenticate, async (req, res) => {
     console.log('🆕', 'Registering email', email, '...');
 
     // Is the email already registered?
-    const user = await getUserByEmail(email);
-    if (user) {
+    if (await getUserByEmail(email)) {
       console.log('❌', email, 'is already registered');
       return res.status(409).send(`The Email ${email} is already registered.`);
     }
 
-    const isRegistered = await registerUser(req.id, email, password);
+    const user = await getUserById(req.id);
+    if (!user) res.status(409).send();
+
+    const isRegistered = await registerUser(user, email, password);
+
     if (isRegistered) {
       console.log('✔️', email, 'registered successfully');
     } else {
       console.log('❌', email, 'failed to register');
       res.status(409).send();
     }
+
+    // Give the user welcome items
+    addWelcomeItems(user.id);
 
     res.status(201).send();
   } catch (err) {
