@@ -11,3 +11,7 @@ export function generateVerifyCode(): string {
     code += chars[Math.floor(Math.random() * chars.length)];
   return code;
 }
+
+export function experienceNeededFromLevel(level: number): number {
+  return Math.round(100 + (level - 1) * 7);
+}

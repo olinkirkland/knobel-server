@@ -1,3 +1,4 @@
+import { experienceNeededFromLevel } from '../util';
 import { invalidateUser } from './socket-controller';
 import { getUserById } from './user-controller';
 
@@ -18,7 +19,28 @@ export async function addExperience(id: string, amount: number) {
   const user = await getUserById(id);
   if (!user) return false;
 
-  user.experience += amount;
+  amount = Math.floor(amount);
+
+  console.log(
+    '✨',
+    `${user.name} received +${amount} experience (${user.experience} -> ${
+      user.experience + amount
+    })`
+  );
+
+  let experience = user.experience + amount;
+  let level = user.level;
+
+  while (experience >= experienceNeededFromLevel(level)) {
+    // Level up
+    level++;
+    experience -= experienceNeededFromLevel(level);
+    console.log('🌟', user.name, `leveled up (${level - 1} -> ${level})`);
+  }
+
+  user.level = level;
+  user.experience = experience;
+
   await user.save();
 
   invalidateUser(user);
