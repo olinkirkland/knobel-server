@@ -3,6 +3,10 @@ import { model, Schema } from 'mongoose';
 export default model(
   'User',
   new Schema({
+    socket: {
+      type: String,
+      required: false
+    },
     id: {
       type: String,
       required: true

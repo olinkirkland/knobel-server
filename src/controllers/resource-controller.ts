@@ -1,3 +1,4 @@
+import { invalidateUser } from './socket-controller';
 import { getUserById } from './user-controller';
 
 export enum ItemType {
@@ -19,6 +20,8 @@ export async function addExperience(id: string, amount: number) {
 
   user.experience += amount;
   await user.save();
+
+  invalidateUser(user);
   return true;
 }
 
@@ -28,6 +31,8 @@ export async function addItem(id: string, item: string) {
 
   user.inventory.push(item);
   await user.save();
+
+  invalidateUser(user);
   return true;
 }
 
@@ -40,6 +45,8 @@ export async function removeItem(id: string, item: string) {
 
   user.inventory.splice(user.inventory.indexOf(item), 1);
   await user.save();
+
+  invalidateUser(user);
   return true;
 }
 
@@ -52,5 +59,7 @@ export async function addWelcomeItems(id: string) {
   user.inventory.push(ItemType.NAME_CHANGE);
   await addGold(id, 100);
   await user.save();
+
+  invalidateUser(user);
   return true;
 }

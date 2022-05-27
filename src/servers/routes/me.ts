@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import express from 'express';
 import { ItemType, removeItem } from '../../controllers/resource-controller';
+import { invalidateUser } from '../../controllers/socket-controller';
 import { getUserByEmail, getUserById } from '../../controllers/user-controller';
 import { toPersonalUserData } from '../../database/schemas/user';
 import authenticate from '../../middlewares/authenticate';
@@ -38,6 +39,7 @@ router.post('/email', authenticate, identify, async (req, res) => {
   user.email = email;
   await user.save();
 
+  invalidateUser(user);
   res.sendStatus(200);
 });
 
@@ -54,6 +56,7 @@ router.post('/password', authenticate, identify, async (req, res) => {
   user.password = await bcrypt.hash(req.body.newPassword, 10);
   await user.save();
 
+  invalidateUser(user);
   res.sendStatus(200);
 });
 
@@ -66,6 +69,7 @@ router.post('/name', authenticate, identify, async (req, res) => {
   user.name = req.body.name;
   await user.save();
 
+  invalidateUser(user);
   res.sendStatus(200);
 });
 
@@ -78,6 +82,7 @@ router.post('/avatar', authenticate, identify, async (req, res) => {
   user.avatar = req.body.avatar;
   await user.save();
 
+  invalidateUser(user);
   res.sendStatus(200);
 });
 
@@ -90,6 +95,7 @@ router.post('/wallpaper', authenticate, identify, async (req, res) => {
   user.wallpaper = req.body.wallpaper;
   await user.save();
 
+  invalidateUser(user);
   res.sendStatus(200);
 });
 
@@ -99,6 +105,7 @@ router.post('/note', authenticate, identify, async (req, res) => {
   user.note = req.body.note;
   await user.save();
 
+  invalidateUser(user);
   res.sendStatus(200);
 });
 
