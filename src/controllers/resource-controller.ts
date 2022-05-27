@@ -54,10 +54,7 @@ export async function addWelcomeItems(id: string) {
   const user = await getUserById(id);
   if (!user) return false;
 
-  user.inventory.push(ItemType.NAME_CHANGE);
-  user.inventory.push(ItemType.NAME_CHANGE);
-  user.inventory.push(ItemType.NAME_CHANGE);
-  await addGold(id, 100);
+  await addGold(id, 500);
   await user.save();
 
   invalidateUser(user);

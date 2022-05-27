@@ -37,6 +37,7 @@ export function startSocketServer() {
     jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, async (err, data) => {
       const id = data['id'];
       const user = await getUserById(id);
+      if (!user) return;
       user.socket = socket.id;
       await user.save();
       sockets[socket.id] = socket;

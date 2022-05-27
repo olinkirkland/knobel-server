@@ -30,6 +30,7 @@ export async function createGuestUser() {
       'KgkdXnvuUjgFg9mFsF_o1' // Embroidery (Wallpaper)
     ],
     verifyCode: generateVerifyCode(),
+    isVerified: false,
     gold: 0,
     level: 1,
     experience: 0

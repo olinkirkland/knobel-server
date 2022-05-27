@@ -27,6 +27,10 @@ export default model(
       type: String,
       required: false
     },
+    isVerified: {
+      type: Boolean,
+      required: true
+    },
     name: {
       type: String,
       required: true
@@ -83,7 +87,8 @@ export function toPersonalUserData(user) {
     inventory: user.inventory,
     gold: user.gold,
     experience: user.experience,
-    wallpaper: user.wallpaper
+    wallpaper: user.wallpaper,
+    isVerified: user.isVerified
   });
 
   return packedUser;

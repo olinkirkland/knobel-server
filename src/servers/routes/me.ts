@@ -1,6 +1,10 @@
 import bcrypt from 'bcrypt';
 import express from 'express';
-import { ItemType, removeItem } from '../../controllers/resource-controller';
+import {
+  addWelcomeItems,
+  ItemType,
+  removeItem
+} from '../../controllers/resource-controller';
 import { invalidateUser } from '../../controllers/socket-controller';
 import { getUserByEmail, getUserById } from '../../controllers/user-controller';
 import { toPersonalUserData } from '../../database/schemas/user';
@@ -109,4 +113,19 @@ router.post('/note', authenticate, identify, async (req, res) => {
   res.sendStatus(200);
 });
 
-router.post('/verify', authenticate, async (req, res) => {});
+router.post('/verify', authenticate, identify, async (req, res) => {
+  const user = await getUserById(req.id);
+  if (!user) return res.sendStatus(404);
+
+  const code = req.body.code;
+  if (code !== user.verifyCode) return res.sendStatus(401);
+
+  if (!user.isVerified) {
+    user.isVerified = true;
+    addWelcomeItems(user.id);
+    await user.save();
+  }
+
+  invalidateUser(user);
+  res.sendStatus(200);
+});

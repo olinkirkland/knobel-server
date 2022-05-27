@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { addWelcomeItems } from '../controllers/resource-controller';
+import { addItem, ItemType } from '../controllers/resource-controller';
 import {
   createGuestUser,
   getUserByEmail,
@@ -125,8 +125,7 @@ app.post('/register', authenticate, async (req, res) => {
       res.status(409).send();
     }
 
-    // Give the user welcome items
-    addWelcomeItems(user.id);
+    addItem(user.id, ItemType.NAME_CHANGE);
 
     res.status(201).send();
   } catch (err) {
