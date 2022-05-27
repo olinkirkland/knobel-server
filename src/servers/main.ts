@@ -7,6 +7,7 @@ import { connectToDatabase } from '../database/database';
 import { toPublicUserData } from '../database/schemas/user';
 import authenticate from '../middlewares/authenticate';
 import meRoute from './routes/me';
+import shopRoute from './routes/shop';
 
 dotenv.config();
 const app = express();
@@ -22,6 +23,7 @@ connectToDatabase();
 startSocketServer();
 
 app.use('/me', meRoute);
+app.use('/shop', shopRoute);
 
 app.get('/user/:id', authenticate, async (req, res) => {
   const targetUser = await getUserById(req.params.id);

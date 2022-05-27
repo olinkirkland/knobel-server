@@ -38,3 +38,8 @@ Content-Type: application/json
   "email": "foo@foo.com",
   "password": "password123"
 }
+
+###
+
+GET http://localhost:3000/shop
+Content-Type: application/json
