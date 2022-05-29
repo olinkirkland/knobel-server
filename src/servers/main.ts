@@ -32,6 +32,6 @@ app.get('/user/:id', authenticate, async (req, res) => {
   res.json(toPublicUserData(targetUser));
 });
 
-app.listen(process.env.SERVER_PORT, () => {
-  return console.log('Main server is listening on port', process.env.AUTH_PORT);
+app.listen(process.env.PORT, () => {
+  return console.log('Main server is listening on port', process.env.PORT);
 });

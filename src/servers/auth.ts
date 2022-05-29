@@ -18,7 +18,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: ['http://localhost:4000', 'https://localhost:4000'],
+    origin: ['*', 'http://localhost:4000', 'https://localhost:4000'],
     credentials: true
   })
 );
@@ -139,6 +139,6 @@ function generateAccessToken(user) {
   });
 }
 
-app.listen(process.env.AUTH_PORT, () => {
+app.listen(process.env.PORT, () => {
   return console.log('Auth server is listening on port', process.env.AUTH_PORT);
 });
