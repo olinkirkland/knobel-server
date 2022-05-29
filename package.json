@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start-main": "nodemon dist/servers/main.js",
     "start-auth": "nodemon dist/servers/auth.js",
-    "start": "nodemon dist/servers/main.js",
+    "start": "dist/servers/main.js & dist/servers/auth.js",
     "tsc-w": "tsc --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
