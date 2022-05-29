@@ -133,6 +133,10 @@ app.post('/register', authenticate, async (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.send('Auth server is running.');
+});
+
 function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: '15m'
