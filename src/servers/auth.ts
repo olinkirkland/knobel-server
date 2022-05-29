@@ -17,15 +17,12 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(
-  cors({
-    origin: [
-      'http://localhost:4000',
-      'https://localhost:4000',
-      'http://84.166.18.6:4000'
-    ],
-    credentials: true
-  })
+  cors()
 );
+
+app.get('/', (req, res) => {
+  res.send('Auth server is running.');
+});
 
 // Add 0.5 seconds of delay to every response
 app.use(function (req, res, next) {
@@ -135,10 +132,6 @@ app.post('/register', authenticate, async (req, res) => {
   } catch (err) {
     res.status(500).send();
   }
-});
-
-app.get('/', (req, res) => {
-  res.send('Auth server is running.');
 });
 
 function generateAccessToken(user) {
