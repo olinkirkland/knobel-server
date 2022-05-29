@@ -6,19 +6,20 @@
   "scripts": {
     "start-main": "nodemon dist/servers/main.js",
     "start-auth": "nodemon dist/servers/auth.js",
-    "start": "tsc & dist/servers/main.js & dist/servers/auth.js",
     "tsc-w": "tsc --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "tsc",
+    "start": "dist/servers/main.js & dist/servers/auth.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "typescript": "^4.6.3",
     "@types/bcrypt": "^5.0.0",
     "@types/uuid": "^8.3.4",
     "nodemon": "^2.0.16"
   },
   "dependencies": {
-    "typescript": "^4.6.3",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.13",
     "@types/jsonwebtoken": "^8.5.8",
