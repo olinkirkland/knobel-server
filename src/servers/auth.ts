@@ -16,9 +16,7 @@ import authenticate from '../middlewares/authenticate';
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(
-  cors()
-);
+app.use(cors());
 
 app.get('/', (req, res) => {
   res.send('Auth server is running.');
@@ -141,5 +139,5 @@ function generateAccessToken(user) {
 }
 
 app.listen(process.env.PORT, () => {
-  return console.log('Auth server is listening on port', process.env.AUTH_PORT);
+  return console.log('Auth server is listening on port', process.env.PORT);
 });
