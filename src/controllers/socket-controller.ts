@@ -6,33 +6,15 @@ import { getUserById } from './user-controller';
 const sockets = {};
 let socketsToInvalidate = [];
 
-export function startSocketServer() {
-  const httpServer = createServer();
-
-  const config = {
-    cors: {
-      origin: ['http://localhost:4000', 'https://localhost:4000'],
-      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE'
-    }
-  };
-
-  setInterval(() => {
-    if (socketsToInvalidate.length === 0) return;
-
-    // Reduce invalidations to unique strings
-    socketsToInvalidate = [...new Set(socketsToInvalidate)];
-
-    socketsToInvalidate.forEach((id) => {
-      sockets[id].emit('invalidate');
-    });
-
-    socketsToInvalidate = [];
-  }, 100);
-
+export function startSocketServer(app) {
+  const httpServer = createServer(app);
+  const config = { cors: { origin: ['http://localhost:4000', 'https://localhost:4000'], methods: ['GET', 'POST'] } };
   const io = new Server(httpServer, config);
 
   io.on('connection', (socket) => {
     // Is socket authenticated?
+    console.log(socket.id, 'connected');
+
     const token: string = socket.handshake.query.token as string;
     jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, async (err, data) => {
       const id = data['id'];
@@ -52,13 +34,26 @@ export function startSocketServer() {
     delete sockets[socket.id];
   });
 
-  httpServer.listen(process.env.SOCKET_PORT, () => {
-    console.log(
-      '💻',
-      'Socket server is listening on port',
-      process.env.SOCKET_PORT
-    );
+  httpServer.listen(process.env.PORT, () => {
+    console.log('💻', 'Socket server is listening on port', process.env.PORT);
   });
+
+  startInvalidationInterval();
+}
+
+function startInvalidationInterval() {
+  setInterval(() => {
+    if (socketsToInvalidate.length === 0) return;
+
+    // Reduce invalidations to unique strings
+    socketsToInvalidate = [...new Set(socketsToInvalidate)];
+
+    socketsToInvalidate.forEach((id) => {
+      sockets[id].emit('invalidate');
+    });
+
+    socketsToInvalidate = [];
+  }, 100);
 }
 
 export function invalidateUser(user) {

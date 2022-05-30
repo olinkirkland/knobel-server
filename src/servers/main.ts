@@ -20,7 +20,7 @@ app.use(
 );
 
 connectToDatabase();
-startSocketServer();
+startSocketServer(app);
 
 app.use('/me', meRoute);
 app.use('/shop', shopRoute);
@@ -32,6 +32,10 @@ app.get('/user/:id', authenticate, async (req, res) => {
   res.json(toPublicUserData(targetUser));
 });
 
-app.listen(process.env.PORT, () => {
-  return console.log('Main server is listening on port', process.env.PORT);
-});
+// app.listen(process.env.PORT, () => {
+//   return console.log(
+//     '💻',
+//     'Main server is listening on port',
+//     process.env.PORT
+//   );
+// });
