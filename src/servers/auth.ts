@@ -24,7 +24,7 @@ app.use(
 );
 
 app.get('/', (req, res) => {
-  res.send('Auth server is running.');
+  res.send('Main server is running.');
 });
 
 // Add 0.5 seconds of delay to every response
