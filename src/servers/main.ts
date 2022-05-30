@@ -22,6 +22,10 @@ app.use(
 connectToDatabase();
 startSocketServer(app);
 
+app.get('/', (req, res) => {
+  res.send(`Hello World! It's me, the main server.`);
+});
+
 app.use('/me', meRoute);
 app.use('/shop', shopRoute);
 
