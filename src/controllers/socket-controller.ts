@@ -8,7 +8,16 @@ let socketsToInvalidate = [];
 
 export function startSocketServer(app) {
   const httpServer = createServer(app);
-  const config = { cors: { origin: ['http://localhost:4000', 'https://localhost:4000'], methods: ['GET', 'POST'] } };
+  const config = {
+    cors: {
+      origin: [
+        'http://localhost:4000',
+        'https://localhost:4000',
+        'http://84.166.18.6:4000'
+      ],
+      methods: ['GET', 'POST']
+    }
+  };
   const io = new Server(httpServer, config);
 
   io.on('connection', (socket) => {
