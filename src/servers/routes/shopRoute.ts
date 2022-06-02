@@ -6,7 +6,6 @@ const prices = require('../../../data/prices.json');
 const sales = require('../../../data/sales.json');
 
 const router = express.Router();
-
 export default router;
 
 router.get('/', authenticate, identify, async (req, res) => {

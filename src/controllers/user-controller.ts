@@ -1,8 +1,6 @@
-import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import User from '../database/schemas/user';
 import { generateGuestName, generateVerifyCode } from '../util';
-import { ItemType } from './resource-controller';
 
 export async function registerUser(user, email: string, password: string) {
   if (user.isRegistered) return false;

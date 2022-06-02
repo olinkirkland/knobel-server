@@ -62,6 +62,10 @@ export default model(
     note: {
       type: String,
       required: false
+    },
+    game: {
+      type: String,
+      required: false
     }
   })
 );
@@ -73,7 +77,8 @@ export function toPublicUserData(user) {
     avatar: user.avatar,
     note: user.note,
     level: user.level,
-    isRegistered: user.isRegistered
+    isRegistered: user.isRegistered,
+    game: user.game
   };
 
   return packedUser;
