@@ -3,20 +3,24 @@ import Signal from '../Signal';
 import { SocketEvent } from './socket-controller';
 
 // Ongoing games are kept in this array
-export const games = [];
+export let games = [];
 
 Signal.instance.addListener(SocketEvent.DISCONNECT, (user) => {
-  console.log('🔌 User', user.name, 'disconnected');
-  if (user.game) leaveGame(user);
+  if (user.game) removeUserFromGame(user);
 });
 
 export function hostGame(user, options: GameOptions) {
-  console.log(user, options);
   console.log(`🎮 ${user.name} is creating game '${options.name}' ...`);
 
   // A user cannot host a game if they are already in a game
   if (user.game) {
-    console.log(`🎮 ${user.name} is already in a game`);
+    console.log(`❌ ${user.name} is already in a game`);
+    return false;
+  }
+
+  // A user cannot host a game if they are already hosting a game
+  if (games.find((g) => g.host.id === user.id)) {
+    console.log(`❌ ${user.name} is already hosting a game`);
     return false;
   }
 
@@ -27,7 +31,7 @@ export function hostGame(user, options: GameOptions) {
   return game.id;
 }
 
-export function joinGame(user, gameId: string) {
+export function addUserToGame(user, gameId: string) {
   console.log(`🎮 User ${user.name} is joining game ${gameId} ...`);
 
   // A user cannot join a game if they are already in a game
@@ -46,14 +50,8 @@ export function joinGame(user, gameId: string) {
   return true;
 }
 
-export function leaveGame(user) {
-  console.log(`🎮 ${user.username} is leaving their current game ...`);
-
-  // A user must be in a game to leave
-  if (!user.game) {
-    console.log(`🎮 ${user.username} is not in a game`);
-    return false;
-  }
+export function removeUserFromGame(user) {
+  console.log(`🎮 ${user.name} is leaving their current game ...`);
 
   const game: Game = getGameById(user.game);
   if (!game) return false;
@@ -65,7 +63,9 @@ export function leaveGame(user) {
   if (game.players.length === 0) {
     // Delete the game if there are no players left
     game.dispose();
-    games.splice(games.indexOf(game), 1);
+
+    games = games.filter((g) => g.id !== game.id);
+
     console.log(
       `🗑️ Game ${game.name} was deleted because there were no players`
     );

@@ -9,7 +9,7 @@ export default class Game {
   public id: string;
   public name: string;
   public host: any;
-  public players: any[];
+  public players: any[] = [];
 
   constructor(options: GameOptions, host) {
     this.id = uuid();

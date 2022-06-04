@@ -54,18 +54,16 @@ export function startSocketServer(app) {
           user: toPublicUserData(user)
         });
       });
-    });
-  });
 
-  io.on('disconnect', async (socket) => {
-    const id = sockets[socket.id].handshake.query.id as string;
-    const user = await getUserById(id);
-    user.socket = null;
-    await user.save();
-    delete sockets[socket.id];
+      socket.on('disconnect', async () => {
+        user = await getUserById(id);
+        user.socket = null;
+        await user.save();
+        delete sockets[socket.id];
 
-    Signal.instance.emit(SocketEvent.DISCONNECT, {
-      user
+        Signal.instance.emit(SocketEvent.DISCONNECT, user);
+        console.log('🔌 User', user.name, 'disconnected');
+      });
     });
   });
 

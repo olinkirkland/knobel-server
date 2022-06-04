@@ -2,8 +2,8 @@ import express from 'express';
 import {
   games,
   hostGame,
-  joinGame,
-  leaveGame
+  addUserToGame,
+  removeUserFromGame
 } from '../../controllers/game-controller';
 import authenticate from '../../middlewares/authenticate';
 import identify from '../../middlewares/identify';
@@ -25,15 +25,16 @@ router.post('/host', authenticate, identify, (req, res) => {
 
 router.post('/join', authenticate, identify, (req, res) => {
   // Join a game by id
-  const gameId = req.body.gameId;
-  joinGame(req.user, gameId)
+  const gameId = req.body.id;
+  console.log(gameId);
+  addUserToGame(req.user, gameId)
     ? res.status(200).send('Joined game')
     : res.status(400).send('Failed to join game');
 });
 
 router.post('/leave', authenticate, identify, (req, res) => {
   // Leave the current game
-  leaveGame(req.user);
+  removeUserFromGame(req.user);
 });
 
 router.get('/', authenticate, identify, (req, res) => {
