@@ -33,9 +33,9 @@ app.get('/', (req, res) => {
 });
 
 // Add 0.5 seconds of delay to every response
-app.use(function (req, res, next) {
-  setTimeout(next, 500);
-});
+// app.use(function (req, res, next) {
+//   setTimeout(next, 500);
+// });
 
 connectToDatabase();
 
